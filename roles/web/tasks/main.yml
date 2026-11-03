@@ -1,0 +1,55 @@
+---
+- name: Installer nginx, php-fpm et php-mysql
+  apt:
+    name:
+      - nginx
+      - php-fpm
+      - php-mysql
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Démarrer php-fpm et nginx
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - php7.4-fpm
+    - nginx
+
+- name: Créer le dossier de l'application
+  file:
+    path: /var/www/app
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+
+- name: Déployer le VirtualHost Nginx
+  template:
+    src: nginx_site.j2
+    dest: /etc/nginx/sites-available/app.conf
+    mode: "0644"
+  notify: Restart nginx
+
+- name: Activer le site
+  file:
+    src: /etc/nginx/sites-available/app.conf
+    dest: /etc/nginx/sites-enabled/app.conf
+    state: link
+  notify: Restart nginx
+
+- name: Désactiver le site par défaut
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Restart nginx
+
+- name: Déployer index.php (template Jinja2)
+  template:
+    src: index.php.j2
+    dest: /var/www/app/index.php
+    owner: www-data
+    group: www-data
+    mode: "0644"

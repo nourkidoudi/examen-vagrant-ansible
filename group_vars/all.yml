@@ -1,0 +1,5 @@
+db_host: 192.168.56.20
+db_name: app_db
+db_user: app_user
+db_password: "AppUser#2026"
+db_allowed_hosts: "192.168.56.%"

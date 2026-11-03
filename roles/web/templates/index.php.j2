@@ -1,0 +1,16 @@
+<?php
+mysqli_report(MYSQLI_REPORT_OFF);
+$conn = @new mysqli("{{ db_host }}", "{{ db_user }}", "{{ db_password }}", "{{ db_name }}");
+?>
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Examen Ansible</title></head>
+<body>
+  <h1>Serveur Web : {{ ansible_host }}</h1>
+  <?php if ($conn->connect_errno): ?>
+    <p style="color:red">Échec de connexion à MySQL : <?= htmlspecialchars($conn->connect_error) ?></p>
+  <?php else: ?>
+    <p style="color:green">Connexion réussie à la base <b>{{ db_name }}</b> sur {{ db_host }}</p>
+  <?php endif; ?>
+</body>
+</html>

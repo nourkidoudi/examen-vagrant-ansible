@@ -1,0 +1,43 @@
+---
+- name: Installer MySQL Server et PyMySQL
+  apt:
+    name:
+      - mysql-server
+      - python3-pymysql
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Configurer MySQL pour écouter sur 0.0.0.0
+  template:
+    src: mysqld.cnf.j2
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart mysql
+
+- name: S'assurer que MySQL tourne
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Appliquer le redémarrage tout de suite si la config a changé
+  meta: flush_handlers
+
+- name: Créer la base app_db
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Créer app_user avec accès depuis 192.168.56.0/24
+  mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    host: "{{ db_allowed_hosts }}"
+    priv: "{{ db_name }}.*:ALL"
+    state: present
+    update_password: on_create
+    login_unix_socket: /var/run/mysqld/mysqld.sock
