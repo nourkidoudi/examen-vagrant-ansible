@@ -81,6 +81,10 @@ Connexion SSH sans mot de passe depuis `ansible-control` vers les 3 nœuds :
 
 ![SSH sans mot de passe](captures/vms-ssh.png)
 
+Vérification avec l'authentification par mot de passe désactivée (`-o PasswordAuthentication=no`), donc la connexion se fait uniquement par clé :
+
+![SSH par clé uniquement](captures/ssh-nopass.png)
+
 ---
 
 ## Partie 2 : Structuration et configuration Ansible
@@ -129,6 +133,10 @@ Le rôle `web` :
 - déploie un **VirtualHost Nginx** (`nginx_site.j2`) qui transmet les fichiers PHP à PHP-FPM via le socket `/run/php/php7.4-fpm.sock`, et désactive le site par défaut ;
 - déploie le **template Jinja2** `index.php.j2`, qui affiche l'IP du serveur web (`{{ ansible_host }}`) et le résultat de la connexion à `app_db` sur `192.168.56.20` ;
 - utilise un **handler** `Restart nginx`, déclenché à chaque modification de la configuration Nginx.
+
+Structure et contenu des rôles `db` et `web` :
+
+![Rôles db et web](captures/roles.png)
 
 ### 2.4 : Playbook principal `site.yml`
 
